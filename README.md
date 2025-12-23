@@ -14,11 +14,24 @@ Coolify provides a built-in WordPress resource type that makes deployment easy:
      - **Name**: Your WordPress instance name
      - **Domain**: Your domain name (ensure DNS A record points to your server)
      - **Database Password**: Set a secure password
+     - **Build Pack**: Select "Dockerfile" if you want to use the custom theme
 4. **Deploy**: Click "Create" and Coolify will handle the rest
+
+### Using Custom Theme with Coolify
+
+**Option 1: Using Dockerfile (Recommended)**
+- Coolify will automatically use the `Dockerfile` in this repository
+- The custom theme in `wp-content/themes/custom-theme/` will be included in the build
+- After deployment, activate the theme in WordPress Admin → Appearance → Themes
+
+**Option 2: Using Volume Mounts**
+- In Coolify, go to your WordPress resource → Volumes
+- Add a volume mount: `./wp-content/themes:/var/www/html/wp-content/themes`
+- Redeploy your application
 
 ## Manual Deployment with Docker Compose
 
-If you prefer to use the docker-compose.yml file directly:
+If you prefer to use the docker-compose.yaml file directly:
 
 1. **Copy environment file**:
    ```bash
@@ -38,6 +51,7 @@ If you prefer to use the docker-compose.yml file directly:
 4. **Access WordPress**:
    - Open your browser and navigate to your domain
    - Complete the WordPress installation wizard
+   - Go to Appearance → Themes and activate "Custom Theme"
 
 ## Configuration
 

@@ -13,7 +13,7 @@ services:
       WORDPRESS_TABLE_PREFIX: ${WORDPRESS_TABLE_PREFIX}
     volumes:
       - wordpress_data:/var/www/html
-      - ./wp-content:/var/www/html/wp-content
+      - /data/coolify/applications/jkgck0w8ww4kwws0gk8kg0wc/wp-content:/var/www/html/wp-content:rw
     depends_on:
       db:
         condition: service_started

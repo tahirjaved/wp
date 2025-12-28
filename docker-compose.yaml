@@ -11,11 +11,10 @@ services:
       WORDPRESS_TABLE_PREFIX: ${WORDPRESS_TABLE_PREFIX}
     volumes:
       - wordpress_data:/var/www/html
-      # Mount wp-content from Git source directory (Coolify clones Git repos to source directory)
-      - /data/coolify/source/jkgck0w8ww4kwws0gk8kg0wc/wp-content:/var/www/html/wp-content:rw
+      - ./wp-content:/var/www/html/wp-content
     depends_on:
       db:
-        condition: service_started
+        condition: service_healthy
     networks:
       - wordpress-network
     
@@ -37,7 +36,6 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
-      start_period: 30s
 
 volumes:
   wordpress_data:

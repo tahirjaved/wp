@@ -25,8 +25,9 @@ services:
     volumes:
       # Mount WordPress core files (everything except wp-content)
       - wordpress_data:/var/www/html
-      # Mount wp-content from Git source using absolute path
-      # This ensures the theme is available regardless of Coolify's working directory
+      # Mount wp-content from Git source directory
+      # Coolify pulls Git repo to source/, and we mount from there
+      # Note: Coolify may also mount from applications/, but this ensures source files are available
       - /data/coolify/source/jkgck0w8ww4kwws0gk8kg0wc/wp-content:/var/www/html/wp-content
     depends_on:
       db:

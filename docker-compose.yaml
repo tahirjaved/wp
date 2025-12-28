@@ -20,25 +20,27 @@ services:
       - default
     labels:
       # Catch-all configuration for 500+ domains
-      # IMPORTANT: Don't add domains in Coolify UI - this catch-all handles all domains
+      # This works alongside Coolify's domain-specific labels
       - "traefik.enable=true"
       - "traefik.http.middlewares.gzip.compress=true"
       - "traefik.http.middlewares.redirect-to-https.redirectscheme.scheme=https"
       - "traefik.http.middlewares.redirect-to-https.redirectscheme.permanent=true"
-      # Catch-all HTTPS router
-      - "traefik.http.routers.wordpress-https.rule=HostRegexp(`{host:.+}`) && PathPrefix(`/`)"
-      - "traefik.http.routers.wordpress-https.entrypoints=https"
-      - "traefik.http.routers.wordpress-https.middlewares=gzip"
-      - "traefik.http.routers.wordpress-https.tls.certresolver=letsencrypt"
-      - "traefik.http.routers.wordpress-https.tls=true"
-      - "traefik.http.routers.wordpress-https.service=wordpress-service"
+      # Catch-all HTTPS router (catches domains not explicitly configured in Coolify)
+      - "traefik.http.routers.wordpress-catchall-https.rule=HostRegexp(`{host:.+}`) && PathPrefix(`/`)"
+      - "traefik.http.routers.wordpress-catchall-https.entrypoints=https"
+      - "traefik.http.routers.wordpress-catchall-https.middlewares=gzip"
+      - "traefik.http.routers.wordpress-catchall-https.tls.certresolver=letsencrypt"
+      - "traefik.http.routers.wordpress-catchall-https.tls=true"
+      - "traefik.http.routers.wordpress-catchall-https.service=wordpress"
+      - "traefik.http.routers.wordpress-catchall-https.priority=1"
       # Catch-all HTTP router (redirects to HTTPS)
-      - "traefik.http.routers.wordpress-http.rule=HostRegexp(`{host:.+}`) && PathPrefix(`/`)"
-      - "traefik.http.routers.wordpress-http.entrypoints=http"
-      - "traefik.http.routers.wordpress-http.middlewares=redirect-to-https"
-      - "traefik.http.routers.wordpress-http.service=wordpress-service"
-      # Service
-      - "traefik.http.services.wordpress-service.loadbalancer.server.port=80"
+      - "traefik.http.routers.wordpress-catchall-http.rule=HostRegexp(`{host:.+}`) && PathPrefix(`/`)"
+      - "traefik.http.routers.wordpress-catchall-http.entrypoints=http"
+      - "traefik.http.routers.wordpress-catchall-http.middlewares=redirect-to-https"
+      - "traefik.http.routers.wordpress-catchall-http.service=wordpress"
+      - "traefik.http.routers.wordpress-catchall-http.priority=1"
+      # Service - use container name for auto-discovery
+      - "traefik.http.services.wordpress.loadbalancer.server.port=80"
     
   db:
     image: mariadb:latest

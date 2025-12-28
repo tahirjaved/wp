@@ -18,22 +18,26 @@ services:
     networks:
       - wordpress-network
     labels:
-      # Traefik catch-all configuration for unlimited domains
-      # This accepts any domain and lets WordPress Multisite handle routing
+      # Catch-all configuration for 500+ domains
+      # IMPORTANT: Don't add domains in Coolify UI - this catch-all handles all domains
       - "traefik.enable=true"
-      # Catch-all rule - accepts any domain (scalable to 500+ domains)
-      - "traefik.http.routers.wordpress.rule=HostRegexp(`{host:.+}`)"
-      # Use http and https entry points (common in Coolify)
-      - "traefik.http.routers.wordpress.entrypoints=http,https"
-      - "traefik.http.routers.wordpress.tls.certresolver=letsencrypt"
-      # Let Traefik auto-generate SSL certificates per domain (removed wildcard)
-      - "traefik.http.services.wordpress.loadbalancer.server.port=80"
-      # HTTP to HTTPS redirect
-      - "traefik.http.routers.wordpress-http.rule=HostRegexp(`{host:.+}`)"
-      - "traefik.http.routers.wordpress-http.entrypoints=http"
-      - "traefik.http.routers.wordpress-http.middlewares=redirect-to-https"
+      - "traefik.http.middlewares.gzip.compress=true"
       - "traefik.http.middlewares.redirect-to-https.redirectscheme.scheme=https"
       - "traefik.http.middlewares.redirect-to-https.redirectscheme.permanent=true"
+      # Catch-all HTTPS router
+      - "traefik.http.routers.wordpress-https.rule=HostRegexp(`{host:.+}`) && PathPrefix(`/`)"
+      - "traefik.http.routers.wordpress-https.entrypoints=https"
+      - "traefik.http.routers.wordpress-https.middlewares=gzip"
+      - "traefik.http.routers.wordpress-https.tls.certresolver=letsencrypt"
+      - "traefik.http.routers.wordpress-https.tls=true"
+      - "traefik.http.routers.wordpress-https.service=wordpress-service"
+      # Catch-all HTTP router (redirects to HTTPS)
+      - "traefik.http.routers.wordpress-http.rule=HostRegexp(`{host:.+}`) && PathPrefix(`/`)"
+      - "traefik.http.routers.wordpress-http.entrypoints=http"
+      - "traefik.http.routers.wordpress-http.middlewares=redirect-to-https"
+      - "traefik.http.routers.wordpress-http.service=wordpress-service"
+      # Service
+      - "traefik.http.services.wordpress-service.loadbalancer.server.port=80"
     
   db:
     image: mariadb:latest

@@ -17,6 +17,7 @@ services:
         condition: service_started
     networks:
       - wordpress-network
+      - default
     labels:
       # Catch-all configuration for 500+ domains
       # IMPORTANT: Don't add domains in Coolify UI - this catch-all handles all domains
@@ -62,4 +63,7 @@ volumes:
 networks:
   wordpress-network:
     driver: bridge
+  default:
+    external: true
+    name: coolify
 

@@ -17,7 +17,6 @@ services:
         condition: service_started
     networks:
       - wordpress-network
-      - coolify-traefik
     labels:
       # Traefik catch-all configuration for unlimited domains
       # This accepts any domain and lets WordPress Multisite handle routing
@@ -59,7 +58,4 @@ volumes:
 networks:
   wordpress-network:
     driver: bridge
-  coolify-traefik:
-    external: true
-    name: coolify-traefik
 

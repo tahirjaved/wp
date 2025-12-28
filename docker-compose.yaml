@@ -25,9 +25,9 @@ services:
     volumes:
       # Mount WordPress core files (everything except wp-content)
       - wordpress_data:/var/www/html
-      # Mount wp-content from Git source - this overlays wp-content from the volume
-      # The bind mount takes precedence, so custom-theme from Git will be available
-      - ./wp-content:/var/www/html/wp-content
+      # Mount wp-content from Git source using absolute path
+      # This ensures the theme is available regardless of Coolify's working directory
+      - /data/coolify/source/jkgck0w8ww4kwws0gk8kg0wc/wp-content:/var/www/html/wp-content
     depends_on:
       db:
         condition: service_started

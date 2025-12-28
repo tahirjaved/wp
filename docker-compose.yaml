@@ -25,20 +25,21 @@ services:
       - "traefik.http.middlewares.gzip.compress=true"
       - "traefik.http.middlewares.redirect-to-https.redirectscheme.scheme=https"
       - "traefik.http.middlewares.redirect-to-https.redirectscheme.permanent=true"
-      # Catch-all HTTPS router (catches domains not explicitly configured in Coolify)
+      # Catch-all HTTPS router (catches ALL domains - works with Coolify's domain-specific routers)
       - "traefik.http.routers.wordpress-catchall-https.rule=HostRegexp(`{host:.+}`) && PathPrefix(`/`)"
       - "traefik.http.routers.wordpress-catchall-https.entrypoints=https"
       - "traefik.http.routers.wordpress-catchall-https.middlewares=gzip"
       - "traefik.http.routers.wordpress-catchall-https.tls.certresolver=letsencrypt"
       - "traefik.http.routers.wordpress-catchall-https.tls=true"
       - "traefik.http.routers.wordpress-catchall-https.service=wordpress-service"
-      - "traefik.http.routers.wordpress-catchall-https.priority=0"
+      # Higher priority to ensure it matches (Coolify's routers will override if domain is in UI)
+      - "traefik.http.routers.wordpress-catchall-https.priority=10"
       # Catch-all HTTP router (redirects to HTTPS)
       - "traefik.http.routers.wordpress-catchall-http.rule=HostRegexp(`{host:.+}`) && PathPrefix(`/`)"
       - "traefik.http.routers.wordpress-catchall-http.entrypoints=http"
       - "traefik.http.routers.wordpress-catchall-http.middlewares=redirect-to-https"
       - "traefik.http.routers.wordpress-catchall-http.service=wordpress-service"
-      - "traefik.http.routers.wordpress-catchall-http.priority=0"
+      - "traefik.http.routers.wordpress-catchall-http.priority=10"
       # Service - let Traefik auto-discover the container
       # Traefik will find the container on the coolify network automatically
       - "traefik.http.services.wordpress-service.loadbalancer.server.port=80"

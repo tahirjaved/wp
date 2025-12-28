@@ -23,10 +23,11 @@ services:
         define( 'SITE_ID_CURRENT_SITE', 1 );
         define( 'BLOG_ID_CURRENT_SITE', 1 );
     volumes:
+      # Mount WordPress core files (everything except wp-content)
       - wordpress_data:/var/www/html
-      # Mount themes directory from Git source
-      # This ensures custom-theme from Git is available in the container
-      - ./wp-content/themes:/var/www/html/wp-content/themes
+      # Mount wp-content from Git source - this overlays wp-content from the volume
+      # The bind mount takes precedence, so custom-theme from Git will be available
+      - ./wp-content:/var/www/html/wp-content
     depends_on:
       db:
         condition: service_started

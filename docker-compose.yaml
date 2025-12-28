@@ -31,16 +31,18 @@ services:
       - "traefik.http.routers.wordpress-catchall-https.middlewares=gzip"
       - "traefik.http.routers.wordpress-catchall-https.tls.certresolver=letsencrypt"
       - "traefik.http.routers.wordpress-catchall-https.tls=true"
-      - "traefik.http.routers.wordpress-catchall-https.service=wordpress"
-      - "traefik.http.routers.wordpress-catchall-https.priority=1"
+      - "traefik.http.routers.wordpress-catchall-https.service=wordpress-service"
+      - "traefik.http.routers.wordpress-catchall-https.priority=0"
       # Catch-all HTTP router (redirects to HTTPS)
       - "traefik.http.routers.wordpress-catchall-http.rule=HostRegexp(`{host:.+}`) && PathPrefix(`/`)"
       - "traefik.http.routers.wordpress-catchall-http.entrypoints=http"
       - "traefik.http.routers.wordpress-catchall-http.middlewares=redirect-to-https"
-      - "traefik.http.routers.wordpress-catchall-http.service=wordpress"
-      - "traefik.http.routers.wordpress-catchall-http.priority=1"
-      # Service - use container name for auto-discovery
-      - "traefik.http.services.wordpress.loadbalancer.server.port=80"
+      - "traefik.http.routers.wordpress-catchall-http.service=wordpress-service"
+      - "traefik.http.routers.wordpress-catchall-http.priority=0"
+      # Service - let Traefik auto-discover the container
+      # Traefik will find the container on the coolify network automatically
+      - "traefik.http.services.wordpress-service.loadbalancer.server.port=80"
+      - "traefik.http.services.wordpress-service.loadbalancer.passHostHeader=true"
     
   db:
     image: mariadb:latest

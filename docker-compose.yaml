@@ -23,14 +23,14 @@ services:
       - "traefik.enable=true"
       # Catch-all rule - accepts any domain (scalable to 500+ domains)
       - "traefik.http.routers.wordpress.rule=HostRegexp(`{host:.+}`)"
-      - "traefik.http.routers.wordpress.entrypoints=web,websecure"
+      # Use http and https entry points (common in Coolify)
+      - "traefik.http.routers.wordpress.entrypoints=http,https"
       - "traefik.http.routers.wordpress.tls.certresolver=letsencrypt"
-      # Auto-generate SSL certificates for each domain
-      - "traefik.http.routers.wordpress.tls.domains[0].main=*"
+      # Let Traefik auto-generate SSL certificates per domain (removed wildcard)
       - "traefik.http.services.wordpress.loadbalancer.server.port=80"
       # HTTP to HTTPS redirect
       - "traefik.http.routers.wordpress-http.rule=HostRegexp(`{host:.+}`)"
-      - "traefik.http.routers.wordpress-http.entrypoints=web"
+      - "traefik.http.routers.wordpress-http.entrypoints=http"
       - "traefik.http.routers.wordpress-http.middlewares=redirect-to-https"
       - "traefik.http.middlewares.redirect-to-https.redirectscheme.scheme=https"
       - "traefik.http.middlewares.redirect-to-https.redirectscheme.permanent=true"

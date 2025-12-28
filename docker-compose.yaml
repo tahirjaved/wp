@@ -24,7 +24,7 @@ services:
         # define( 'BLOG_ID_CURRENT_SITE', 1 );
     volumes:
       - wordpress_data:/var/www/html
-      - ./wp-content/themes/custom-theme:/var/www/html/wp-content/themes/custom-theme
+      - ./wp-content/themes/snowremoval:/var/www/html/wp-content/themes/snowremoval
     depends_on:
       db:
         condition: service_started

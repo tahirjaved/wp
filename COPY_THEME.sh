@@ -41,4 +41,10 @@ echo "Theme location: $APP_DIR/custom-theme/"
 ls -la "$APP_DIR/custom-theme/"
 echo ""
 echo "Now restart the WordPress container to see the theme:"
-echo "docker restart wordpress-fkc08k04okos0sswo080sg0o-163732317117"
+CONTAINER_NAME=$(docker ps --filter "ancestor=wordpress:latest" --format "{{.Names}}" | head -1)
+if [ -n "$CONTAINER_NAME" ]; then
+    echo "Found container: $CONTAINER_NAME"
+    echo "Run: docker restart $CONTAINER_NAME"
+else
+    echo "Run: docker restart <wordpress-container-name>"
+fi

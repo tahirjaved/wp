@@ -1,0 +1,86 @@
+services:
+  wordpress:
+    image: wordpress:latest
+    container_name: wordpress
+    restart: unless-stopped
+    environment:
+      WORDPRESS_DB_HOST: db
+      WORDPRESS_DB_USER: ${MYSQL_USER}
+      WORDPRESS_DB_PASSWORD: ${MYSQL_PASSWORD}
+      WORDPRESS_DB_NAME: ${MYSQL_DATABASE}
+      WORDPRESS_TABLE_PREFIX: ${WORDPRESS_TABLE_PREFIX}
+      WORDPRESS_CONFIG_EXTRA: |
+        // Keep debug logging but hide output in browser
+        define('WP_DEBUG_LOG', true);
+        define('WP_DEBUG_DISPLAY', false);
+        if (function_exists('ini_set')) { @ini_set('display_errors', '0'); }
+        define('SCRIPT_DEBUG', true);
+        define('WP_ALLOW_MULTISITE', true);
+        define( 'MULTISITE', true );
+        define( 'SUBDOMAIN_INSTALL', false );
+        define( 'DOMAIN_CURRENT_SITE', 'bostonsnowremoval.us' );
+        define( 'PATH_CURRENT_SITE', '/' );
+        define( 'SITE_ID_CURRENT_SITE', 1 );
+        define( 'BLOG_ID_CURRENT_SITE', 1 );
+    volumes:
+      - wordpress_data:/var/www/html
+      - ./wp-content:/var/www/html/wp-content
+    depends_on:
+      db:
+        condition: service_started
+    networks:
+      - wordpress-network
+      - default
+    labels:
+      # Catch-all configuration for 500+ domains
+      # This works alongside Coolify's domain-specific labels
+      - "traefik.enable=true"
+      - "traefik.http.middlewares.gzip.compress=true"
+      - "traefik.http.middlewares.redirect-to-https.redirectscheme.scheme=https"
+      - "traefik.http.middlewares.redirect-to-https.redirectscheme.permanent=true"
+      # Catch-all HTTPS router - matches any domain
+      - "traefik.http.routers.wordpress-catchall-https.rule=HostRegexp(`.*`)"
+      - "traefik.http.routers.wordpress-catchall-https.entrypoints=https"
+      - "traefik.http.routers.wordpress-catchall-https.middlewares=gzip"
+      - "traefik.http.routers.wordpress-catchall-https.tls.certresolver=letsencrypt"
+      - "traefik.http.routers.wordpress-catchall-https.tls=true"
+      - "traefik.http.routers.wordpress-catchall-https.service=wordpress-catchall"
+      - "traefik.http.routers.wordpress-catchall-https.priority=0"
+      # Catch-all HTTP router (redirects to HTTPS)
+      - "traefik.http.routers.wordpress-catchall-http.rule=HostRegexp(`.*`)"
+      - "traefik.http.routers.wordpress-catchall-http.entrypoints=http"
+      - "traefik.http.routers.wordpress-catchall-http.middlewares=redirect-to-https"
+      - "traefik.http.routers.wordpress-catchall-http.service=wordpress-catchall"
+      - "traefik.http.routers.wordpress-catchall-http.priority=0"
+      # Service definitions - use a single shared service to avoid conflicts
+      # This service will be used by catch-all routers and won't conflict with Coolify's routers
+      - "traefik.http.services.wordpress-catchall.loadbalancer.server.port=80"
+      - "traefik.http.services.wordpress-catchall.loadbalancer.passHostHeader=true"
+    
+  db:
+    image: mariadb:latest
+    container_name: wordpress_db
+    restart: unless-stopped
+    environment:
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+    volumes:
+      - db_data:/var/lib/mysql
+    networks:
+      - wordpress-network
+    # Healthcheck removed - using service_started instead for more reliable startup
+    # WordPress will retry database connection automatically
+
+volumes:
+  wordpress_data:
+  db_data:
+
+networks:
+  wordpress-network:
+    driver: bridge
+  default:
+    external: true
+    name: coolify
+

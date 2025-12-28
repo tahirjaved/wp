@@ -1,0 +1,30 @@
+{
+  "name": "snowremoval-wordpress-theme",
+  "version": "1.0.0",
+  "description": "WordPress theme for snow removal services built with Tailwind CSS",
+  "scripts": {
+    "build:css": "tailwindcss -i ./assets/css/tailwind.css -o ./assets/css/style.css --minify",
+    "watch:css": "tailwindcss -i ./assets/css/tailwind.css -o ./assets/css/style.css --watch"
+  },
+  "devDependencies": {
+    "@tailwindcss/aspect-ratio": "^0.4.2",
+    "@tailwindcss/container-queries": "^0.1.1",
+    "@tailwindcss/forms": "^0.5.10",
+    "@tailwindcss/typography": "^0.5.19",
+    "tailwindcss": "^4.1.14",
+    "autoprefixer": "^10.4.16",
+    "postcss": "^8.4.32"
+  },
+  "dependencies": {
+    "@tailwindcss/cli": "^4.1.14"
+  },
+  "keywords": [
+    "wordpress",
+    "theme",
+    "tailwindcss",
+    "snow-removal"
+  ],
+  "author": "",
+  "license": "GPL-2.0-or-later"
+}
+

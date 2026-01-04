@@ -24,38 +24,13 @@ services:
         # define( 'BLOG_ID_CURRENT_SITE', 1 );
     volumes:
       - wordpress_data:/var/www/html
-      - ./wp-content/themes/snowremoval:/var/www/html/wp-content/themes/snowremoval
+      - ./wp-content/:/var/www/html/wp-content/
     depends_on:
       db:
         condition: service_started
     networks:
       - wordpress-network
       - default
-    labels:
-      # Catch-all configuration for 500+ domains
-      # This works alongside Coolify's domain-specific labels
-      - "traefik.enable=true"
-      - "traefik.http.middlewares.gzip.compress=true"
-      - "traefik.http.middlewares.redirect-to-https.redirectscheme.scheme=https"
-      - "traefik.http.middlewares.redirect-to-https.redirectscheme.permanent=true"
-      # Catch-all HTTPS router - matches any domain
-      - "traefik.http.routers.wordpress-catchall-https.rule=HostRegexp(`.*`)"
-      - "traefik.http.routers.wordpress-catchall-https.entrypoints=https"
-      - "traefik.http.routers.wordpress-catchall-https.middlewares=gzip"
-      - "traefik.http.routers.wordpress-catchall-https.tls.certresolver=letsencrypt"
-      - "traefik.http.routers.wordpress-catchall-https.tls=true"
-      - "traefik.http.routers.wordpress-catchall-https.service=wordpress-catchall"
-      - "traefik.http.routers.wordpress-catchall-https.priority=0"
-      # Catch-all HTTP router (redirects to HTTPS)
-      - "traefik.http.routers.wordpress-catchall-http.rule=HostRegexp(`.*`)"
-      - "traefik.http.routers.wordpress-catchall-http.entrypoints=http"
-      - "traefik.http.routers.wordpress-catchall-http.middlewares=redirect-to-https"
-      - "traefik.http.routers.wordpress-catchall-http.service=wordpress-catchall"
-      - "traefik.http.routers.wordpress-catchall-http.priority=0"
-      # Service definitions - use a single shared service to avoid conflicts
-      # This service will be used by catch-all routers and won't conflict with Coolify's routers
-      - "traefik.http.services.wordpress-catchall.loadbalancer.server.port=80"
-      - "traefik.http.services.wordpress-catchall.loadbalancer.passHostHeader=true"
     
   db:
     image: mariadb:latest
